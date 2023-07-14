@@ -16,7 +16,7 @@ const Login = () => {
             version="1.1"
           >
             {" "}
-            <title>Google-color</title> <desc>Created with Sketch.</desc>{" "}
+            <title>Google-color</title>{" "}
             <defs> </defs>{" "}
             <g
               id="Icons"
@@ -71,3 +71,4 @@ const Login = () => {
 };
 
 export default Login;
+
