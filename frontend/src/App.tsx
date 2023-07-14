@@ -1,9 +1,11 @@
-
+import  Login  from './components/Login'
 function App() {
 
   return (
     <>
-      <p className="text-blue-500"> GEllo </p>
+      <div className="w-screen h-screen bg-slate-900">
+        <Login />
+      </div>
     </>
   )
 }
