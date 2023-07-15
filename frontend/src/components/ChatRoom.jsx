@@ -3,7 +3,7 @@ import Navbar from "./Navbar"
 import Profile from "./Profile"
 import Searchbar from "./SearchBar"
 import Loader from "./Loader"
-function ChatRoom() {
+function App() {
   const [user,setUser] = useState({
     username : ""
   })
@@ -87,7 +87,7 @@ function ChatRoom() {
     setInput(user.username)
   }
   return (
-    <div className={`${theme ? "bg-blue-900	" : "bg-whitish-blue"} w-full min-h-screen flex flex-col justify-center items-center py-20`}>
+    <div className={`${theme ? "bg-dark-navy-blue" : "bg-whitish-blue"} w-full min-h-screen flex flex-col justify-center items-center py-20`}>
       {loading ? <Loader
       dark = {theme}/> : <>
       <div className="w-11/12 xs:w-5/6 sm:w-110 600:w-100 lg:w-120 ">
@@ -117,4 +117,4 @@ function ChatRoom() {
   )
 }
 
-export default ChatRoom;
+export default App

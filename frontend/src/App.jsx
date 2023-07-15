@@ -33,25 +33,25 @@ const LogOut = () => {
 
 
 function App() {
-  const [user] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
   const [userPhoto, setUserPhoto] = useState(null);
   const [name, setName] = useState(null);
+  const [theme,setTheme] = useState(true)
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
     if(user){
       setUserPhoto(user.photoURL);
       setName(user.displayName);
     }
-  })
+  }, [user])
+
+  if(loading){
+    return <div className="loader"></div>
+  }
   return (
     <>{
       user ? 
-      <ChatRoom />
-      // <div className='bg-violet-400 h-screen w-screen'>
-      //   <p className='text-center	hover:'> Hello {name} </p>
-      //   <img className="w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src={userPhoto ?? "public/default.jpeg"} alt="Bordered avatar" />
-      // </div>
+      <ChatRoom theme={theme} setTheme={setTheme}/>
       :
       <Login loginWithGoogle={() =>{
         signInWithPopup(auth, provider)
@@ -61,7 +61,6 @@ function App() {
           // const token = credential.accessToken;
           // The signed-in user info.
           const user = result.user;
-          localStorage.setItem('user', JSON.stringify(user));
           // IdP data available using getAdditionalUserInfo(result)
           // ...
         }).catch((error) => {
