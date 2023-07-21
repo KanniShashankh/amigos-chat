@@ -21,43 +21,50 @@ function App() {
   const [user, loading] = useAuthState(auth);
   const [userPhoto, setUserPhoto] = useState(null);
   const [name, setName] = useState(null);
-  const [theme, setTheme] = useState(true);
+  const [theme,setTheme] = useState(true)
 
   useEffect(() => {
-    if (user) {
+    if(user){
       setUserPhoto(user.photoURL);
       setName(user.displayName);
     }
-  }, [user]);
+  }, [user])
 
-  if (loading) {
-    return <div className="loader"></div>;
+  if(loading){
+    return <div className="loader"></div>
   }
   return (
-    <>
-      {user ? (
-        <ChatRoom
-          theme={theme}
-          logout={LogOut}
-          photo={userPhoto}
-          username={name}
-          setTheme={setTheme}
-        />
-      ) : (
-        <Login
-          loginWithGoogle={() => {
-            signInWithPopup(auth, provider)
-              .then((result) => {
-                const user = result.user;
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-          }}
-        />
-      )}
+    <>{
+      user ? 
+      <ChatRoom theme={theme} setTheme={setTheme}/>
+      :
+      <Login loginWithGoogle={() =>{
+        signInWithPopup(auth, provider)
+        .then((result) => {
+          // This gives you a Google Access Token. You can use it to access the Google API.
+          // const credential = GoogleAuthProvider.credentialFromResult(result);
+          // const token = credential.accessToken;
+          // The signed-in user info.
+          const user = result.user;
+          // IdP data available using getAdditionalUserInfo(result)
+          // ...
+        }).catch((error) => {
+          console.error(error);
+
+          // Handle Errors here.
+          // const errorCode = error.code;
+          // const errorMessage = error.message;
+          // // The email of the user's account used.
+          // const email = error.customData.email;
+          // // The AuthCredential type that was used.
+          // const credential = GoogleAuthProvider.credentialFromError(error);
+          // ...
+        });
+      }} /> 
+    }
+      
     </>
-  );
+  )
 }
 
-export default App;
+export default App
