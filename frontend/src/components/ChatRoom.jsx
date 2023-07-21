@@ -1,120 +1,108 @@
-import { useEffect, useState } from "react"
-import Navbar from "./Navbar"
-import Profile from "./Profile"
-import Searchbar from "./SearchBar"
-import Loader from "./Loader"
-function App() {
-  const [user,setUser] = useState({
-    username : ""
-  })
-  const [loading,setLoading] = useState(true)
-  const [input,setInput] = useState("octocat")
-  const [error,setError] = useState(false)
-  const [theme,setTheme] = useState(true)
-  function handleUser(event){
-    const {name,value} = event.target
-    setUser((prevUser) => {
-      return{
-      ...prevUser,
-      [name] : value
-      }
-    },
-    )
+import { useEffect, useState } from "react";
+import { signOut } from "firebase/auth";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  query,
+  orderBy,
+  onSnapshot,
+  limit,
+  getDocs,
+} from "firebase/firestore";
+
+import { auth, db } from "../config";
+
+function App(props) {
+  const [message, setMessage] = useState("");
+  const [theme, setTheme] = useState(true);
+  const [messages, setMessages] = useState([]);
+
+  function toggleTheme() {
+    setTheme((prevTheme) => !prevTheme);
   }
 
-  const [github,setGithub] = useState([])
+  const sendMessage = async (e) => {
+    e.preventDefault();
+
+    if (message.trim() === "") {
+      alert("Enter valid message");
+      return;
+    }
+
+    const { uid, photoURL, displayName } = auth.currentUser;
+
+    try {
+      const messageRef = await addDoc(collection(db, "messages"), {
+        message,
+        timestamp: serverTimestamp(),
+        uid,
+        photoURL,
+        displayName,
+      });
+      console.log("Document written with ID: ", messageRef.id);
+      setMessage("");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
-    async function getProfile(){
-      const res = await fetch(`https://api.github.com/users/${input}`)
-      if(res.status == 200){
-      const data = await res.json()
-      setError(false)
-      console.log(data)
-      setGithub(data)
-      const timerId = setTimeout(() => {
-        setLoading(false)
-      },2000)
-      return () => clearTimeout(timerId)
-    }
-    else{
-      console.log(res.status);
-      setLoading(false)
-      setError(true)
-    }
-  
-  }
-    getProfile()
-  },[input])
- const [profile,setProfile] = useState({
-  name : "",
-  avatar_url : "",
-  login : "",
-  created_at : "",
-  bio : "",
-  public_repos : "",
-  followers : "",
-  following : "",
-  location : "",
-  blog : "",
-  twitter_username : "",
-  company : "",
-  message : ""
- })
- function toggleTheme(){
-  setTheme(prevTheme => !prevTheme)
- }
- useEffect(() => {
-  setProfile((prevProfile) => {
-    return{
-    ...prevProfile,
-    name : github.name,
-    avatar_url : github.avatar_url,
-    login : github.login,
-    created_at : github.created_at,
-    bio : github.bio,
-    public_repos : github.public_repos,
-    followers : github.followers,
-    following : github.following,
-    location : github.location,
-    blog : github.blog,
-    twitter_username : github.twitter_username,
-    company : github.company,
-      }})
- },[github])
+    const getData = async () => {
+      let result = [];
+      const doc_refs = await getDocs(collection(db, "messages"));
+       result = doc_refs.forEach(element => {
+        result.push(element.data().message);
+        return result;
+      });
 
-  function handleClick(event){
-    event.preventDefault()
-    setInput(user.username)
-  }
+      setMessages(result);
+      console.log(result);
+    };
+    getData();
+  }, []);
+
   return (
-    <div className={`${theme ? "bg-dark-navy-blue" : "bg-whitish-blue"} w-full min-h-screen flex flex-col justify-center items-center py-20`}>
-      {loading ? <Loader
-      dark = {theme}/> : <>
-      <div className="w-11/12 xs:w-5/6 sm:w-110 600:w-100 lg:w-120 ">
-       <Navbar 
-       onClick = {toggleTheme}
-       dark = {theme}/>
-       </div>
-       <div className="xs:w-5/6 w-11/12 sm:w-110 600:w-100 lg:w-120 ">
-        <Searchbar 
-        onChange = {handleUser}
-        user = {user.username}
-        onClick = {handleClick}
-        error = {error}
-        dark = {theme}/>
-       </div>
-       <div className ="xs:w-5/6 w-11/12 600:w-100 sm:w-110 lg:w-120 ">
-        <Profile 
-        input = {input}
-        user = {user.username}
-        profile = {profile}
-        dark = {theme}
-        />
-       </div>
-       </>}
+    <div
+      className={`${
+        theme ? "bg-dark-navy-blue" : "bg-whitish-blue"
+      } w-full min-h-screen flex flex-col py-20`}
+    >
+      <div className="w-screen max-w-full  flex justify-between flex-col p-1 overflow-hidden">
+        <div className="flex-1 max-w-full">
+          <h1 className="text-4xl max-w-full font-bold text-center text-white"></h1>
+        </div>
+        <>
+          
+            {/* {
+              messages.map((item, index)=><p key={index}>{item}</p>)
+            } */}
+          
+        </>
+        <form onSubmit={(event) => sendMessage(event)}>
+          <div className="max-w-full flex absolute bottom-0 mb-1 ">
+            <div className="flex justify-center w-[95vw]">
+              <input
+                type="text"
+                id="first_name"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-[80vw] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Type your message..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                required
+              ></input>
+              <button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-700 text-white bg-gray font-bold py-2 px-4 rounded"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
-    
-  )
+  );
 }
 
-export default App
+export default App;

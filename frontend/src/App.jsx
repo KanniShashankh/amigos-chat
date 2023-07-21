@@ -1,36 +1,21 @@
+import Login from "./Pages/LoginPage";
+import { auth, provider } from "./config";
+import ChatRoom from "./components/ChatRoom"
+import { signInWithPopup, signOut } from "firebase/auth";
 
-import Login from './Pages/LoginPage'
-import { initializeApp } from 'firebase/app';
-import { getAnalytics } from "firebase/analytics";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { useCollectionData } from 'react-firebase-hooks/firestore';
-import { useEffect, useState } from 'react';
-import ChatRoom from './components/ChatRoom';
+import { useAuthState } from "react-firebase-hooks/auth";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDBNJJ2Ey-tVRm0IPbgJO0d_S6yXcDowXc",
-  authDomain: "amigos-chat-1.firebaseapp.com",
-  projectId: "amigos-chat-1",
-  storageBucket: "amigos-chat-1.appspot.com",
-  messagingSenderId: "636112292833",
-  appId: "1:636112292833:web:6d25743b0014944fac20a0",
-  measurementId: "G-590LNKHYWX"
-};
-
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const provider = new GoogleAuthProvider();
-const auth = getAuth();
+import { useEffect, useState } from "react";
 
 const LogOut = () => {
-  signOut(auth).then(() => {
-    localStorage.clear();
-  }).catch((error) => {
-    console.error(error);
-  });
-}
-
+  signOut(auth)
+    .then(() => {
+      localStorage.clear();
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
 
 function App() {
   const [user, loading] = useAuthState(auth);
